@@ -1,0 +1,3471 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API do Sistema de Vendas",
+        "description": "Documentação da API de gestão de produtos, utilizadores, categorias e vendas.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Mesmo servidor e porta da documentação Swagger"
+        }
+    ],
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Iniciar sessão e obter token",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login efetuado; copiar o campo token para Authorize",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "token",
+                                        "token_type",
+                                        "user"
+                                    ],
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "1|token-pessoal"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Ana Silva"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "ana@example.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "cliente"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciais inválidas"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Terminar sessão",
+                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "responses": {
+                    "200": {
+                        "description": "Sessão terminada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sessions": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Listar sessões da conta autenticada",
+                "operationId": "4f163e1ab8f8246afd5d9e4e69415bb5",
+                "responses": {
+                    "200": {
+                        "description": "Lista de sessões"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sessions/{session}": {
+            "delete": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Terminar uma sessão pelo ID",
+                "operationId": "737b9c9f3f3000c54db862cbee62c48c",
+                "parameters": [
+                    {
+                        "name": "session",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sessão terminada"
+                    },
+                    "404": {
+                        "description": "Sessão não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "delete": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Eliminar logicamente a conta autenticada",
+                "operationId": "3bfc4953b0ade07ede3c1a0f2f29aa25",
+                "responses": {
+                    "200": {
+                        "description": "Conta eliminada logicamente"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Atualizar dados do utilizador autenticado",
+                "operationId": "02391d619bc40c1534ee06cf0cc10764",
+                "responses": {
+                    "200": {
+                        "description": "Utilizador atualizado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reports/best-selling-products": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Listar os produtos mais vendidos (administradores e gerentes)",
+                "operationId": "b528d9d631a002432c251a8c244f7f85",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Produtos ordenados pela quantidade vendida"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/cash-movements": {
+            "get": {
+                "tags": [
+                    "Financial"
+                ],
+                "summary": "Consultar entradas e saídas de dinheiro (administradores, gerentes e caixas)",
+                "operationId": "b7c29b5bf2c28e867d9706f239566e83",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "direction",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "in",
+                                "out"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "sale",
+                                "supplier_purchase",
+                                "refund",
+                                "expense",
+                                "cash_adjustment"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Totais de entradas e saídas e histórico paginado de movimentos em AOA"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/cash-registers": {
+            "get": {
+                "tags": [
+                    "Cash Control"
+                ],
+                "summary": "Listar postos de caixa activos",
+                "operationId": "0f3fbef36f2d072797a2c10ef12cecc7",
+                "responses": {
+                    "200": {
+                        "description": "Postos de caixa disponíveis"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Cash Control"
+                ],
+                "summary": "Criar um posto de caixa (administradores e gerentes)",
+                "operationId": "450113ff92268f857be8534e1e4ebb80",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Caixa 2"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Posto criado"
+                    },
+                    "422": {
+                        "description": "Nome já utilizado ou inválido"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/cash-registers/{cashRegister}": {
+            "patch": {
+                "tags": [
+                    "Cash Control"
+                ],
+                "summary": "Actualizar ou desactivar um posto de caixa",
+                "operationId": "a4119eb08920a5ef64cb6b11086f9587",
+                "parameters": [
+                    {
+                        "name": "cashRegister",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Caixa 2"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Posto actualizado"
+                    },
+                    "409": {
+                        "description": "Não é possível desactivar um posto com sessão aberta"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/cash-sessions/current": {
+            "get": {
+                "tags": [
+                    "Cash Control"
+                ],
+                "summary": "Consultar a sessão de caixa aberta pelo utilizador autenticado",
+                "operationId": "2ecb4f21b00b4ce5ac789305cfad1069",
+                "responses": {
+                    "200": {
+                        "description": "Sessão actual ou null"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/cash-sessions": {
+            "get": {
+                "tags": [
+                    "Cash Control"
+                ],
+                "summary": "Listar sessões de caixa",
+                "operationId": "71c1f12418174d6ee74e4bbc03b3ae96",
+                "responses": {
+                    "200": {
+                        "description": "Sessões paginadas"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Cash Control"
+                ],
+                "summary": "Abrir uma sessão num posto de caixa",
+                "operationId": "5c31ae4a1cd656bc3e9a633505451cad",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "cash_register_id",
+                                    "opening_amount"
+                                ],
+                                "properties": {
+                                    "cash_register_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "opening_amount": {
+                                        "type": "number",
+                                        "example": 5000,
+                                        "minimum": 0
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Sessão aberta; o nome do vendedor é obtido da conta autenticada"
+                    },
+                    "409": {
+                        "description": "Posto ou operador já tem sessão aberta"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/cash-sessions/{cashSession}": {
+            "get": {
+                "tags": [
+                    "Cash Control"
+                ],
+                "summary": "Consultar uma sessão de caixa e a sua conferência",
+                "operationId": "d08ebf339f5b57ff65ab5094704bbbf8",
+                "parameters": [
+                    {
+                        "name": "cashSession",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhe e resumo da sessão"
+                    },
+                    "403": {
+                        "description": "Sem acesso a esta sessão"
+                    },
+                    "404": {
+                        "description": "Sessão não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/cash-sessions/{cashSession}/close": {
+            "post": {
+                "tags": [
+                    "Cash Control"
+                ],
+                "summary": "Fechar sessão e registar o dinheiro contado",
+                "operationId": "58957c9f75c4eec7b6cd927653e14e94",
+                "parameters": [
+                    {
+                        "name": "cashSession",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "counted_amount"
+                                ],
+                                "properties": {
+                                    "counted_amount": {
+                                        "type": "number",
+                                        "example": 14500,
+                                        "minimum": 0
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Sessão fechada com diferença calculada"
+                    },
+                    "409": {
+                        "description": "Sessão já fechada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/cash-sessions/{cashSession}/movements": {
+            "post": {
+                "tags": [
+                    "Cash Control"
+                ],
+                "summary": "Registar entrada ou saída manual de dinheiro",
+                "operationId": "bc097dadc88b511fd66a92e646573792",
+                "parameters": [
+                    {
+                        "name": "cashSession",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "direction",
+                                    "amount",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "direction": {
+                                        "type": "string",
+                                        "enum": [
+                                            "in",
+                                            "out"
+                                        ]
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "example": 1000,
+                                        "minimum": 0.01
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Reforço de troco"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Movimento registado"
+                    },
+                    "409": {
+                        "description": "Sessão fechada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/categories": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Listar categorias",
+                "operationId": "listCategories",
+                "responses": {
+                    "200": {
+                        "description": "Lista de categorias",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Bebidas"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Bebidas diversas",
+                                                "nullable": true
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "activo",
+                                                "enum": [
+                                                    "activo",
+                                                    "inactivo"
+                                                ]
+                                            },
+                                            "products_count": {
+                                                "type": "integer",
+                                                "example": 5
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Criar categoria",
+                "operationId": "createCategory",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Bebidas",
+                                        "maxLength": 255
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Bebidas diversas",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "activo",
+                                        "enum": [
+                                            "activo",
+                                            "inactivo"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Categoria criada com sucesso"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Consultar categoria",
+                "operationId": "showCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categoria encontrada"
+                    },
+                    "404": {
+                        "description": "Categoria não encontrada"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Actualizar categoria",
+                "operationId": "updateCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Bebidas",
+                                        "maxLength": 255
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Bebidas diversas",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "inactivo",
+                                        "enum": [
+                                            "activo",
+                                            "inactivo"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Categoria actualizada com sucesso"
+                    },
+                    "404": {
+                        "description": "Categoria não encontrada"
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Eliminar categoria",
+                "operationId": "deleteCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categoria eliminada com sucesso"
+                    },
+                    "404": {
+                        "description": "Categoria não encontrada"
+                    },
+                    "422": {
+                        "description": "Categoria possui produtos associados"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/me/purchases": {
+            "get": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Consultar histórico de compras do cliente autenticado",
+                "operationId": "6de724afafe279d20d43fb5024fdb04a",
+                "responses": {
+                    "200": {
+                        "description": "Histórico de compras paginado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{user}/purchases": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Consultar histórico de compras de um cliente (administradores e gerentes)",
+                "operationId": "e38600c3c8fca27be8e40f10b3b594c1",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Histórico de compras paginado"
+                    },
+                    "404": {
+                        "description": "Cliente não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reports/sales/by-employee": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Relatório de vendas por vendedor, operador e posto de caixa",
+                "operationId": "0c6c93e55bafc79b18d824a042276aae",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Totais de vendas por funcionário e sessão"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/expenses": {
+            "get": {
+                "tags": [
+                    "Financial"
+                ],
+                "summary": "Listar despesas registadas (administradores, gerentes e caixas)",
+                "operationId": "9b702aa9314d471a9de3a121e5183c88",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de despesas"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Financial"
+                ],
+                "summary": "Registar uma despesa (administradores, gerentes e caixas)",
+                "operationId": "a764a04e6d047ab02a68f06c706e67f3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "description",
+                                    "amount",
+                                    "expense_date",
+                                    "payment_method"
+                                ],
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Pagamento da electricidade"
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "Serviços",
+                                        "nullable": true
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "example": 25000,
+                                        "minimum": 0.01
+                                    },
+                                    "expense_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "payment_method": {
+                                        "type": "string",
+                                        "enum": [
+                                            "dinheiro",
+                                            "cartao",
+                                            "transferencia"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Despesa registada"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reports/financial": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Resumo financeiro diário, semanal ou mensal",
+                "operationId": "21f18d38a387a380314bb26fdf803653",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "daily",
+                                "weekly",
+                                "monthly"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "schema": {
+                            "description": "Dia de referência; por omissão, a data actual",
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resumo de vendas pagas, reembolsos, compras recebidas e saldo operacional estimado em AOA"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Listar todos os produtos",
+                "operationId": "1bfaa78d1c2c3848ab8165c5dadcad3e",
+                "responses": {
+                    "200": {
+                        "description": "Lista de produtos obtida com sucesso"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Registar um novo produto",
+                "operationId": "e8185e307706e2cd84bbcf5171e2f09d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "name",
+                                    "price"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "description": "ID da categoria do produto",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Teclado"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Teclado USB"
+                                    },
+                                    "sku": {
+                                        "type": "string",
+                                        "example": "TEC-001",
+                                        "nullable": true
+                                    },
+                                    "barcode": {
+                                        "type": "string",
+                                        "example": "5601234567890",
+                                        "nullable": true
+                                    },
+                                    "manufacturing_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-01-15",
+                                        "nullable": true
+                                    },
+                                    "expiration_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2027-01-15",
+                                        "nullable": true
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 15000
+                                    },
+                                    "stock": {
+                                        "type": "integer",
+                                        "example": 10
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Produto criado com sucesso"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/products/lookup/{identifier}": {
+            "get": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Pesquisar produto por código de barras, SKU ou ID",
+                "operationId": "400890323cb892cb9b1b7c0939a551e4",
+                "parameters": [
+                    {
+                        "name": "identifier",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Produto localizado"
+                    },
+                    "404": {
+                        "description": "Produto não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/products/{id}": {
+            "get": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Consultar um produto pelo ID",
+                "operationId": "7ab21ddb713501f3d4c2914892c02a21",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do produto",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Produto encontrado"
+                    },
+                    "404": {
+                        "description": "Produto não encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Actualizar um produto (administradores e gerentes)",
+                "operationId": "6a7e11900844cd85cff66e662b82bd4c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do produto a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Teclado mecânico"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Teclado USB actualizado"
+                                    },
+                                    "sku": {
+                                        "type": "string",
+                                        "example": "TEC-001",
+                                        "nullable": true
+                                    },
+                                    "barcode": {
+                                        "type": "string",
+                                        "example": "5601234567890",
+                                        "nullable": true
+                                    },
+                                    "manufacturing_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-01-15",
+                                        "nullable": true
+                                    },
+                                    "expiration_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2027-01-15",
+                                        "nullable": true
+                                    },
+                                    "price": {
+                                        "description": "Administradores e gerentes podem alterar o preço de um produto existente",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 20000
+                                    },
+                                    "stock": {
+                                        "type": "integer",
+                                        "example": 15
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Produto actualizado com sucesso"
+                    },
+                    "404": {
+                        "description": "Produto não encontrado"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Eliminar um produto",
+                "operationId": "e80a6ca46716acee6b47ea1ac91663c0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do produto a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 3
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Produto eliminado com sucesso"
+                    },
+                    "404": {
+                        "description": "Produto não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/purchases": {
+            "get": {
+                "tags": [
+                    "Purchases"
+                ],
+                "summary": "Listar compras recebidas",
+                "operationId": "3e7fda657eab69d8a8f41f202e44a344",
+                "parameters": [
+                    {
+                        "name": "supplier_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de compras"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Purchases"
+                ],
+                "summary": "Registar compra já recebida e actualizar o stock",
+                "operationId": "c5d930515642418b262ea062726e90cf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "supplier_id",
+                                    "items"
+                                ],
+                                "properties": {
+                                    "supplier_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "purchase_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-11-10"
+                                    },
+                                    "invoice_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "payment_status": {
+                                        "description": "Por omissão, pending. Para paid, indique também payment_method.",
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "paid"
+                                        ]
+                                    },
+                                    "payment_method": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "dinheiro",
+                                            "cartao",
+                                            "transferencia"
+                                        ]
+                                    },
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "product_id",
+                                                "quantity",
+                                                "unit_cost"
+                                            ],
+                                            "properties": {
+                                                "product_id": {
+                                                    "type": "integer"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "unit_cost": {
+                                                    "type": "number",
+                                                    "example": 1250,
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Compra registada como recebida e stock actualizado"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/purchases/{purchase}": {
+            "get": {
+                "tags": [
+                    "Purchases"
+                ],
+                "summary": "Consultar uma compra recebida",
+                "operationId": "6df95d81052591218d0127db49944326",
+                "parameters": [
+                    {
+                        "name": "purchase",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Compra encontrada"
+                    },
+                    "404": {
+                        "description": "Compra não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/purchases/{purchase}/payment": {
+            "patch": {
+                "tags": [
+                    "Purchases"
+                ],
+                "summary": "Marcar uma compra recebida como paga",
+                "operationId": "8b351b2080f0d3a6bc84effab456f9bc",
+                "parameters": [
+                    {
+                        "name": "purchase",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "payment_method"
+                                ],
+                                "properties": {
+                                    "payment_method": {
+                                        "type": "string",
+                                        "enum": [
+                                            "dinheiro",
+                                            "cartao",
+                                            "transferencia"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pagamento registado"
+                    },
+                    "409": {
+                        "description": "Compra já paga"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sales": {
+            "get": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Listar vendas próprias ou todas para administradores",
+                "operationId": "419ebb078c83262b05f7c639ae8b2c21",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "completed",
+                                "cancelled"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "payment_method",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "dinheiro",
+                                "cartao",
+                                "transferencia"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de vendas"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Registar uma venda",
+                "operationId": "51f42c056032d143981f26f6c0888f24",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "payment_method",
+                                    "items"
+                                ],
+                                "properties": {
+                                    "client_id": {
+                                        "description": "ID do cliente registado. Opcional para venda a consumidor final.",
+                                        "type": "integer",
+                                        "example": 3,
+                                        "nullable": true
+                                    },
+                                    "payment_method": {
+                                        "type": "string",
+                                        "enum": [
+                                            "dinheiro",
+                                            "cartao",
+                                            "transferencia"
+                                        ]
+                                    },
+                                    "items": {
+                                        "description": "Um ou mais produtos. O preço é obtido do catálogo; não envie price ou unit_price.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "product_id",
+                                                "quantity"
+                                            ],
+                                            "properties": {
+                                                "product_id": {
+                                                    "type": "integer"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "product_id": 1,
+                                                "quantity": 2
+                                            },
+                                            {
+                                                "product_id": 2,
+                                                "quantity": 1
+                                            }
+                                        ],
+                                        "minItems": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Venda registada; inclui cliente, vendedor, produtos e total em AOA",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Venda registada com sucesso."
+                                        },
+                                        "sale": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 16
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 3,
+                                                    "nullable": true
+                                                },
+                                                "client_id": {
+                                                    "type": "integer",
+                                                    "example": 3,
+                                                    "nullable": true
+                                                },
+                                                "customer_name": {
+                                                    "type": "string",
+                                                    "example": "Ana Silva"
+                                                },
+                                                "seller_name": {
+                                                    "type": "string",
+                                                    "example": "João Manuel",
+                                                    "nullable": true
+                                                },
+                                                "total": {
+                                                    "type": "number",
+                                                    "example": 43000
+                                                },
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "product_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "quantity": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "unit_price": {
+                                                                "type": "number",
+                                                                "example": 20000
+                                                            },
+                                                            "subtotal": {
+                                                                "type": "number",
+                                                                "example": 40000
+                                                            },
+                                                            "product": {
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Teclado mecânico"
+                                                                    },
+                                                                    "category": {
+                                                                        "properties": {
+                                                                            "name": {
+                                                                                "type": "string",
+                                                                                "example": "Acessórios"
+                                                                            }
+                                                                        },
+                                                                        "type": "object",
+                                                                        "nullable": true
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "O perfil caixa não pode registar vendas; inicie sessão com a conta individual do vendedor"
+                    },
+                    "422": {
+                        "description": "Dados inválidos ou stock insuficiente"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sales/{id}": {
+            "get": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Consultar uma venda própria ou venda (administradores)",
+                "operationId": "b352670063e2f09edbfb74f39aef9b56",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Venda encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sales/{id}/invoice": {
+            "get": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Gerar factura HTML imprimível",
+                "operationId": "aa07d992c46786459a48bf4870163233",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Factura HTML com valores em AOA"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sales/{id}/cancel": {
+            "post": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Cancelar uma venda (administradores e gerentes)",
+                "operationId": "f151b59b43e7d0adbb786c476555bd38",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Venda cancelada e stock reposto; reembolso pendente"
+                    },
+                    "409": {
+                        "description": "Venda já cancelada ou stock em falta"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sales/{id}/refund": {
+            "patch": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Confirmar o reembolso de uma venda (administradores e gerentes)",
+                "operationId": "f6d94e8932b6b82e571d760d366e617a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reembolso registado"
+                    },
+                    "409": {
+                        "description": "Não existe reembolso pendente"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reports/sales": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Relatório de vendas por período (administradores e gerentes)",
+                "operationId": "b5d666147abc1ae142fbda48903bcd2d",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "completed",
+                                "cancelled"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "payment_method",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "dinheiro",
+                                "cartao",
+                                "transferencia"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Agregados e vendas paginadas em AOA"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sales/{sale}/returns": {
+            "post": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Devolver artigos vendidos e, opcionalmente, criar uma nova venda de troca",
+                "operationId": "ea41d97a97547145bf4e142f0bd2c862",
+                "parameters": [
+                    {
+                        "name": "sale",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "reason",
+                                    "refund_method",
+                                    "items"
+                                ],
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "refund_method": {
+                                        "type": "string",
+                                        "enum": [
+                                            "dinheiro",
+                                            "cartao",
+                                            "transferencia"
+                                        ]
+                                    },
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "sale_item_id",
+                                                "quantity"
+                                            ],
+                                            "properties": {
+                                                "sale_item_id": {
+                                                    "type": "integer"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "exchange_items": {
+                                        "description": "Artigos da nova venda de troca; se enviados, cria uma venda separada associada à devolução.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "product_id",
+                                                "quantity"
+                                            ],
+                                            "properties": {
+                                                "product_id": {
+                                                    "type": "integer"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "exchange_payment_method": {
+                                        "type": "string",
+                                        "enum": [
+                                            "dinheiro",
+                                            "cartao",
+                                            "transferencia"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Devolução processada"
+                    },
+                    "403": {
+                        "description": "Sem permissão para registar devoluções"
+                    },
+                    "404": {
+                        "description": "Venda não encontrada ou não acessível"
+                    },
+                    "422": {
+                        "description": "Quantidade devolvida superior à comprada ou dados inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/stock/alerts": {
+            "get": {
+                "tags": [
+                    "Stock"
+                ],
+                "summary": "Consultar alertas de stock baixo e de caducidade",
+                "operationId": "288ccbf85f81f5a8a60917fba08caa50",
+                "parameters": [
+                    {
+                        "name": "threshold",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 5,
+                            "minimum": 0
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Alertas de stock baixo e produtos caducados ou a caducar nos próximos 30 dias",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "threshold": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "count": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "alerts": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "product_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "product_name": {
+                                                        "type": "string",
+                                                        "example": "Leite"
+                                                    },
+                                                    "quantity": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "alert": {
+                                                        "type": "string",
+                                                        "example": "low_stock"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "expiration_alert_days": {
+                                            "type": "integer",
+                                            "example": 30
+                                        },
+                                        "expiration_alert_count": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "expiration_alerts": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "product_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "product_name": {
+                                                        "type": "string",
+                                                        "example": "Leite"
+                                                    },
+                                                    "category": {
+                                                        "type": "string",
+                                                        "example": "Laticínios",
+                                                        "nullable": true
+                                                    },
+                                                    "quantity": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "manufacturing_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-01-15",
+                                                        "nullable": true
+                                                    },
+                                                    "expiration_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-12-01"
+                                                    },
+                                                    "days_until_expiration": {
+                                                        "type": "integer",
+                                                        "example": 7
+                                                    },
+                                                    "alert": {
+                                                        "type": "string",
+                                                        "example": "expiring_soon",
+                                                        "enum": [
+                                                            "expired",
+                                                            "expiring_soon"
+                                                        ]
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/stock/movements": {
+            "get": {
+                "tags": [
+                    "Stock"
+                ],
+                "summary": "Consultar histórico unificado de movimentos de stock",
+                "operationId": "b57160dbfc9f7397a7eaefc8e172f493",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "initial",
+                                "purchase",
+                                "sale",
+                                "cancellation",
+                                "return",
+                                "adjustment"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Movimentos paginados com stock anterior e posterior"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/stock": {
+            "get": {
+                "tags": [
+                    "Stock"
+                ],
+                "summary": "Listar stock dos produtos",
+                "operationId": "listStock",
+                "responses": {
+                    "200": {
+                        "description": "Lista de stock"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/stock/{product}": {
+            "get": {
+                "tags": [
+                    "Stock"
+                ],
+                "summary": "Consultar stock de um produto",
+                "operationId": "showProductStock",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Stock do produto"
+                    },
+                    "404": {
+                        "description": "Produto não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Stock"
+                ],
+                "summary": "Atualizar stock de um produto",
+                "operationId": "updateProductStock",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "stock",
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "stock": {
+                                        "type": "integer",
+                                        "example": 25,
+                                        "minimum": 0
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "example": "Ajuste após contagem física",
+                                        "maxLength": 255,
+                                        "minLength": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Stock atualizado"
+                    },
+                    "404": {
+                        "description": "Produto não encontrado"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/stock/entries": {
+            "get": {
+                "tags": [
+                    "Stock"
+                ],
+                "summary": "Consultar histórico de entradas de stock recebidas",
+                "operationId": "8e4ec0fdc9c97a99111298edb3c7662b",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "supplier_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entradas de stock com data, produtos, quantidades e fornecedor"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/suppliers": {
+            "get": {
+                "tags": [
+                    "Suppliers"
+                ],
+                "summary": "Listar fornecedores",
+                "operationId": "43efd859bdde27a9e53c0afbe0891731",
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de fornecedores"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Suppliers"
+                ],
+                "summary": "Registar fornecedor",
+                "operationId": "c1ee06af9e1f197a4aa49c1dd74c981c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Fornecedor Central",
+                                        "maxLength": 255
+                                    },
+                                    "contact_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Fornecedor registado"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/suppliers/{supplier}": {
+            "patch": {
+                "tags": [
+                    "Suppliers"
+                ],
+                "summary": "Actualizar dados ou estado de um fornecedor",
+                "operationId": "71d657d086d97ee72c81ae2dcaa7053c",
+                "parameters": [
+                    {
+                        "name": "supplier",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "contact_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Fornecedor actualizado"
+                    },
+                    "404": {
+                        "description": "Fornecedor não encontrado"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/forgot-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Solicitar ligação para recuperar a senha",
+                "operationId": "requestPasswordReset",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ana@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Se a conta existir, será enviada uma ligação de recuperação"
+                    },
+                    "422": {
+                        "description": "Endereço de e-mail inválido"
+                    },
+                    "429": {
+                        "description": "Pedido temporariamente limitado"
+                    }
+                }
+            }
+        },
+        "/api/reset-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Definir uma nova senha com o token de recuperação",
+                "operationId": "resetPassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "token",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ana@example.com"
+                                    },
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Senha redefinida com sucesso"
+                    },
+                    "422": {
+                        "description": "Token inválido, expirado ou dados inválidos"
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Listar utilizadores (administradores e gerentes)",
+                "operationId": "listUsers",
+                "responses": {
+                    "200": {
+                        "description": "Lista de utilizadores",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Ana Silva"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "ana@example.com"
+                                            },
+                                            "role": {
+                                                "description": "Perfil de acesso: administrador, gerente, vendedor, caixa ou cliente",
+                                                "type": "string",
+                                                "enum": [
+                                                    "administrador",
+                                                    "gerente",
+                                                    "vendedor",
+                                                    "caixa",
+                                                    "cliente"
+                                                ]
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Registar utilizador",
+                "operationId": "createUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Ana Silva",
+                                        "maxLength": 255
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ana@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "senha123",
+                                        "minLength": 8
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "912345678",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilizador criado; copiar o campo token para Authorize",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "message",
+                                        "user",
+                                        "token",
+                                        "token_type"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Utilizador registado com sucesso."
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Ana Silva"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "ana@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "912345678",
+                                                    "nullable": true
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "cliente"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "1|token-pessoal"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação dos dados enviados"
+                    }
+                }
+            }
+        },
+        "/api/clients": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Listar clientes (administradores e gerentes)",
+                "operationId": "d5a74e490926d8e6caaef3a1546405e5",
+                "responses": {
+                    "200": {
+                        "description": "Lista de utilizadores com perfil cliente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "description": "ID do perfil de cliente",
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "user_id": {
+                                                "description": "ID da conta de acesso online, se existir",
+                                                "type": "integer",
+                                                "example": 5,
+                                                "nullable": true
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Ana Silva"
+                                            },
+                                            "phone": {
+                                                "type": "string",
+                                                "example": "912345678"
+                                            },
+                                            "customer_type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "individual",
+                                                    "company"
+                                                ]
+                                            },
+                                            "customer_nif": {
+                                                "type": "string",
+                                                "example": "5000000000",
+                                                "nullable": true
+                                            },
+                                            "user": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "format": "email",
+                                                        "example": "ana@example.com"
+                                                    },
+                                                    "role": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "cliente"
+                                                        ]
+                                                    }
+                                                },
+                                                "type": "object",
+                                                "nullable": true
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "403": {
+                        "description": "Perfil sem permissão para consultar clientes"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sellers": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Listar vendedores para selecção no caixa e gestão",
+                "operationId": "f69c316349f6562b6a7d13f6f40b3ab8",
+                "responses": {
+                    "200": {
+                        "description": "Lista de utilizadores com perfil vendedor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 4
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "João Manuel"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "joao@example.com"
+                                            },
+                                            "phone": {
+                                                "type": "string",
+                                                "nullable": true
+                                            },
+                                            "role": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "vendedor"
+                                                ]
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "403": {
+                        "description": "Apenas administradores, gerentes e caixas"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/staff": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Criar uma conta de gerente ou vendedor (apenas administradores)",
+                "operationId": "c2e79f1ce97b140b1d811991e6bdc68c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "João Manuel",
+                                        "maxLength": 255
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "joao@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "912345678",
+                                        "nullable": true
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "gerente",
+                                            "vendedor"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Conta de funcionário criada"
+                    },
+                    "403": {
+                        "description": "Apenas administradores"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/staff/{user}": {
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Remover uma conta de gerente ou vendedor (apenas administradores)",
+                "operationId": "f07ceb0c06f83e79944a08584837370f",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conta removida e sessões de acesso revogadas"
+                    },
+                    "403": {
+                        "description": "Apenas administradores"
+                    },
+                    "409": {
+                        "description": "O funcionário tem uma sessão de caixa aberta"
+                    },
+                    "422": {
+                        "description": "A conta seleccionada não é de gerente ou vendedor"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{user}/role": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Atribuir um perfil de acesso a um utilizador",
+                "operationId": "fa861a0c9198725dd7670f487ae55428",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "role"
+                                ],
+                                "properties": {
+                                    "role": {
+                                        "description": "administrador: acesso total; gerente: gestão da loja e equipa; vendedor: vendas; caixa: vendas e caixa; cliente: compras próprias. Gerentes só podem atribuir vendedor, caixa ou cliente.",
+                                        "type": "string",
+                                        "enum": [
+                                            "administrador",
+                                            "gerente",
+                                            "vendedor",
+                                            "caixa",
+                                            "cliente"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Perfil actualizado"
+                    },
+                    "403": {
+                        "description": "Sem permissão para alterar este perfil"
+                    },
+                    "422": {
+                        "description": "Perfil inválido ou tentativa de remover o último administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/audit-logs": {
+            "get": {
+                "tags": [
+                    "Audit"
+                ],
+                "summary": "Consultar registos de auditoria (apenas administradores)",
+                "operationId": "listAuditLogs",
+                "responses": {
+                    "200": {
+                        "description": "Registos de auditoria paginados"
+                    },
+                    "401": {
+                        "description": "Não autenticado: autorize o Swagger com um token Bearer"
+                    },
+                    "403": {
+                        "description": "Apenas administradores podem consultar a auditoria"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Atualizar dados do utilizador autenticado",
+                "operationId": "updateAuthenticatedUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Ana Silva"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ana@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "912345678",
+                                        "nullable": true
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Luanda",
+                                        "nullable": true
+                                    },
+                                    "bi": {
+                                        "type": "string",
+                                        "example": "000000000LA000",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Dados do utilizador atualizados com sucesso"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Erro de validação dos dados enviados"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Cada funcionário deve iniciar sessão com a sua própria conta em POST /api/login e reutilizar o token Bearer durante o turno. Termine a sessão com POST /api/logout. No botão Authorize, introduza apenas o valor do token. A auditoria requer o perfil administrador.",
+                "bearerFormat": "Personal Access Token",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Reports",
+            "description": "Reports"
+        },
+        {
+            "name": "Financial",
+            "description": "Financial"
+        },
+        {
+            "name": "Cash Control",
+            "description": "Cash Control"
+        },
+        {
+            "name": "Categories",
+            "description": "Categories"
+        },
+        {
+            "name": "Sales",
+            "description": "Sales"
+        },
+        {
+            "name": "Users",
+            "description": "Users"
+        },
+        {
+            "name": "Produtos",
+            "description": "Produtos"
+        },
+        {
+            "name": "Purchases",
+            "description": "Purchases"
+        },
+        {
+            "name": "Stock",
+            "description": "Stock"
+        },
+        {
+            "name": "Suppliers",
+            "description": "Suppliers"
+        },
+        {
+            "name": "Audit",
+            "description": "Audit"
+        }
+    ]
+}
